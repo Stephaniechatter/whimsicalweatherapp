@@ -17,13 +17,10 @@ function App() {
 
   useEffect(() => {
     const fetchWeatherData = async () => {
-      // Simulated weather data
       setTemperature(Math.floor(Math.random() * 41));
       setDescription("☀️ Sunny");
       setHumidity(Math.floor(Math.random() * 101));
       setWindSpeed(Math.floor(Math.random() * 21));
-
-      // Simulated time
       const currentTime = new Date().toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
@@ -33,19 +30,16 @@ function App() {
     };
 
     fetchWeatherData();
-  }, []); // Empty dependency array ensures this effect runs only once
+  }, []);
 
-  // Function to handle city search
   const handleSearch = (event) => {
     event.preventDefault();
     const cityInput = event.target.elements.city.value;
     setCity(cityInput);
-    // Simulate fetching data for the new city (temperature, weather description, etc.)
     setTemperature(Math.floor(Math.random() * 41));
     setDescription("☀️ Sunny");
     setHumidity(Math.floor(Math.random() * 101));
     setWindSpeed(Math.floor(Math.random() * 21));
-    // Simulate updating time
     const currentTime = new Date().toLocaleString("en-US", {
       hour: "numeric",
       minute: "numeric",
@@ -70,7 +64,6 @@ function App() {
         </form>
       </header>
       <main>
-        {/* Displayed city information */}
         <div className="weather-app-data">
           <h1 className="default-city-name">{city}</h1>
           <p className="weather-app-image">{description}</p>
@@ -81,7 +74,6 @@ function App() {
           </p>
         </div>
 
-        {/* Forecast */}
         <div className="forecast-container">
           <h2>4-Day Forecast</h2>
           <div className="forecast-list">
@@ -104,12 +96,12 @@ function Footer() {
     <footer>
       This project was coded by Stephanie White and is{" "}
       <a
-        href="https://github.com/stephaniechatter"
+        href="https://github.com/stephaniechatter/whimsicalweatherapp"
         target="_blank"
         rel="noreferrer"
       >
         open-sourced on GitHub
-      </a>{" https://github.com/stephaniechatter/whimsicalweatherapp"}
+      </a>{" "}
       and hosted on{" "}
       <a href="https://luminous-babka-e88392.netlify.app/" target="_blank" rel="noreferrer">
         Netlify
