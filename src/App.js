@@ -104,14 +104,14 @@ function Footer() {
     <footer>
       This project was coded by Stephanie White and is{" "}
       <a
-        href="https://github.com/stephaniechatter/whimsicalweatherapp"
+        href="https://github.com/stephaniechatter"
         target="_blank"
         rel="noreferrer"
       >
         open-sourced on GitHub
-      </a>{" "}
+      </a>{" https://github.com/stephaniechatter/whimsicalweatherapp"}
       and hosted on{" "}
-      <a href="https://www.netlify.com" target="_blank" rel="noreferrer">
+      <a href="https://luminous-babka-e88392.netlify.app/" target="_blank" rel="noreferrer">
         Netlify
       </a>
       .
