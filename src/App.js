@@ -18,43 +18,40 @@ function App() {
   const [forecast, setForecast] = useState([]);
 
   useEffect(() => {
-    const fetchWeatherData = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-        if (!response.ok) {
-          throw new Error('Weather data not available for that city.');
-        }
-        const data = await response.json();
-        console.log(data); // Log the fetched data to debug
-
-        setTemperatureC(data.main.temp);
-        setTemperatureF(convertCtoF(data.main.temp));
-        setDescription(data.weather[0].description);
-        setHumidity(data.main.humidity);
-        setWindSpeedKmh(data.wind.speed);
-        setWindSpeedMph(convertKmhtoMph(data.wind.speed));
-        const currentTime = new Date().toLocaleString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        });
-        setTime(currentTime);
-
-        // Example forecast data (you can update this based on your requirements)
-        setForecast([
-          { day: "Mon", icon: faSun, className: "fa-sun" },
-          { day: "Tue", icon: faCloudSun, className: "fa-cloud-sun" },
-          { day: "Wed", icon: faCloud, className: "fa-cloud" },
-          { day: "Thu", icon: faCloudRain, className: "fa-cloud-rain" },
-        ]);
-      } catch (error) {
-        console.error('Error fetching weather data:', error.message);
-        // Optionally handle error state or display an error message in your UI
-      }
-    };
-
     fetchWeatherData();
   }, [city]);
+
+  const fetchWeatherData = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+      if (!response.ok) {
+        throw new Error('Weather data not available for that city.');
+      }
+      const data = await response.json();
+
+      setTemperatureC(data.main.temp);
+      setTemperatureF(convertCtoF(data.main.temp));
+      setDescription(data.weather[0].description);
+      setHumidity(data.main.humidity);
+      setWindSpeedKmh(data.wind.speed);
+      setWindSpeedMph(convertKmhtoMph(data.wind.speed));
+      const currentTime = new Date().toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+      setTime(currentTime);
+
+      setForecast([
+        { day: "Mon", icon: faSun, className: "fa-sun" },
+        { day: "Tue", icon: faCloudSun, className: "fa-cloud-sun" },
+        { day: "Wed", icon: faCloud, className: "fa-cloud" },
+        { day: "Thu", icon: faCloudRain, className: "fa-cloud-rain" },
+      ]);
+    } catch (error) {
+      console.error('Error fetching weather data:', error.message);
+    }
+  };
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -82,7 +79,7 @@ function App() {
             id="search-form-input"
             className="search-form-input"
           />
-          <input type="submit" value="Search" className="search-form-button" />
+          <button type="submit" className="search-form-button">Search</button>
         </form>
       </header>
       <main>
