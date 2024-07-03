@@ -3,65 +3,63 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faCloudSun, faCloud, faCloudRain } from '@fortawesome/free-solid-svg-icons';
 import "./App.css";
 
+const API_KEY = "cb286bad3607984b41ed10c8de5cf00e"; 
+const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+
 function App() {
   const [city, setCity] = useState("New York");
-  const [temperatureC, setTemperatureC] = useState(75); 
-  const [temperatureF, setTemperatureF] = useState(0);  
-  const [description, setDescription] = useState(faSun);
-  const [humidity, setHumidity] = useState(60);
-  const [windSpeedKmh, setWindSpeedKmh] = useState(5);   
-  const [windSpeedMph, setWindSpeedMph] = useState(0);  
+  const [temperatureC, setTemperatureC] = useState(0);
+  const [temperatureF, setTemperatureF] = useState(0);
+  const [description, setDescription] = useState("");
+  const [humidity, setHumidity] = useState(0);
+  const [windSpeedKmh, setWindSpeedKmh] = useState(0);
+  const [windSpeedMph, setWindSpeedMph] = useState(0);
   const [time, setTime] = useState("");
-
-  const [forecast] = useState([
-    { day: "Mon", icon: faSun, className: "fa-sun" },
-    { day: "Tue", icon: faCloudSun, className: "fa-cloud-sun" },
-    { day: "Wed", icon: faCloud, className: "fa-cloud" },
-    { day: "Thu", icon: faCloudRain, className: "fa-cloud-rain" },
-  ]);
-
-  const weatherIcons = {
-    sunny: faSun,
-    partlyCloudy: faCloudSun,
-    cloudy: faCloud,
-    rainy: faCloudRain
-  };
+  const [forecast, setForecast] = useState([]);
 
   useEffect(() => {
     const fetchWeatherData = async () => {
-      setTemperatureC(Math.floor(Math.random() * 41));
-      setTemperatureF(convertCtoF(temperatureC));
-      setDescription(weatherIcons.sunny);
-      setHumidity(Math.floor(Math.random() * 101));
-      setWindSpeedKmh(Math.floor(Math.random() * 21));
-      setWindSpeedMph(convertKmhtoMph(windSpeedKmh));
-      const currentTime = new Date().toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      });
-      setTime(currentTime);
+      try {
+        const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+        if (!response.ok) {
+          throw new Error('Weather data not available for that city.');
+        }
+        const data = await response.json();
+        console.log(data); // Log the fetched data to debug
+
+        setTemperatureC(data.main.temp);
+        setTemperatureF(convertCtoF(data.main.temp));
+        setDescription(data.weather[0].description);
+        setHumidity(data.main.humidity);
+        setWindSpeedKmh(data.wind.speed);
+        setWindSpeedMph(convertKmhtoMph(data.wind.speed));
+        const currentTime = new Date().toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        });
+        setTime(currentTime);
+
+        // Example forecast data (you can update this based on your requirements)
+        setForecast([
+          { day: "Mon", icon: faSun, className: "fa-sun" },
+          { day: "Tue", icon: faCloudSun, className: "fa-cloud-sun" },
+          { day: "Wed", icon: faCloud, className: "fa-cloud" },
+          { day: "Thu", icon: faCloudRain, className: "fa-cloud-rain" },
+        ]);
+      } catch (error) {
+        console.error('Error fetching weather data:', error.message);
+        // Optionally handle error state or display an error message in your UI
+      }
     };
 
     fetchWeatherData();
-  }, [temperatureC, windSpeedKmh]);
+  }, [city]);
 
   const handleSearch = (event) => {
     event.preventDefault();
     const cityInput = event.target.elements.city.value;
     setCity(cityInput);
-    setTemperatureC(Math.floor(Math.random() * 41));
-    setTemperatureF(convertCtoF(temperatureC));
-    setDescription(weatherIcons.sunny);
-    setHumidity(Math.floor(Math.random() * 101));
-    setWindSpeedKmh(Math.floor(Math.random() * 21));
-    setWindSpeedMph(convertKmhtoMph(windSpeedKmh));
-    const currentTime = new Date().toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    });
-    setTime(currentTime);
   };
 
   const convertCtoF = (celsius) => {
@@ -91,11 +89,11 @@ function App() {
         <div className="weather-app-data">
           <h1 className="default-city-name">{city}</h1>
           <p className="weather-app-image">
-            <FontAwesomeIcon icon={description} size="2x" />
+            <FontAwesomeIcon icon={description === "Clear" ? faSun : description === "Clouds" ? faCloud : faCloudRain} size="2x" className="weather-icon" />
           </p>
           <p className="weather-app-details">
-            Temperature: <strong>{temperatureC}°C | {temperatureF}°F</strong>, Humidity:{" "}
-            <strong>{humidity}%</strong>, Wind: <strong>{windSpeedKmh} km/h | {windSpeedMph.toFixed(2)} mph</strong>,
+            Temperature: <strong>{temperatureC}°C | {temperatureF.toFixed(2)}°F</strong>, Humidity:{" "}
+            <strong>{humidity}%</strong>, Wind: <strong>{windSpeedKmh.toFixed(2)} km/h | {windSpeedMph.toFixed(2)} mph</strong>,
             Time: <strong>{time}</strong>
           </p>
         </div>
