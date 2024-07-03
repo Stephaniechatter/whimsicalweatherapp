@@ -73,7 +73,6 @@ function App() {
             Time: <strong>{time}</strong>
           </p>
         </div>
-
         <div className="forecast-container">
           <h2>4-Day Forecast</h2>
           <div className="forecast-list">
@@ -94,19 +93,21 @@ function App() {
 function Footer() {
   return (
     <footer>
-      This project was coded by Stephanie White and is{" "}
+      This project was coded by <a
+        href="https://github.com/stephaniechatter"
+        target="_blank"
+        rel="noreferrer"
+      >Stephanie White</a>{" "} and is{" "}
       <a
         href="https://github.com/stephaniechatter/whimsicalweatherapp"
         target="_blank"
         rel="noreferrer"
-      >
-        open-sourced on GitHub
-      </a>{" "}
-      and hosted on{" "}
-      <a href="https://luminous-babka-e88392.netlify.app/" target="_blank" rel="noreferrer">
-        Netlify
-      </a>
-      .
+      >open-sourced on GitHub</a> and hosted on{" "}
+      <a
+        href="https://luminous-babka-e88392.netlify.app/"
+        target="_blank"
+        rel="noreferrer"
+      >Netlify</a>.
     </footer>
   );
 }
