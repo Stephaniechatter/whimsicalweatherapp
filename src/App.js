@@ -8,7 +8,7 @@ function App() {
   const [humidity, setHumidity] = useState(60);
   const [windSpeed, setWindSpeed] = useState(5);
   const [time, setTime] = useState("");
-  const [forecast, setForecast] = useState([
+  const [forecast] = useState([
     { day: "Mon", emoji: "☀️" },
     { day: "Tue", emoji: "🌤️" },
     { day: "Wed", emoji: "⛅" },
@@ -102,9 +102,17 @@ function App() {
 function Footer() {
   return (
     <footer>
-      This project was coded by Stephanie White
-      <a href="https://github.com/stephaniechatter" target="_blank" rel="noopener noreferrer"> and is <a href="https://github.com/Stephaniechatter/whimsicalweatherapp"target="_blank">open sourced</a>
-        and hosted on <a href= "app.netlify.com" target="_blank">Netlify</a>
+      This project was coded by Stephanie White and is{" "}
+      <a
+        href="https://github.com/stephaniechatter/whimsicalweatherapp"
+        target="_blank"
+        rel="noreferrer"
+      >
+        open-sourced on GitHub
+      </a>{" "}
+      and hosted on{" "}
+      <a href="https://www.netlify.com" target="_blank" rel="noreferrer">
+        Netlify
       </a>
       .
     </footer>
@@ -112,4 +120,3 @@ function Footer() {
 }
 
 export default App;
-
