@@ -104,7 +104,7 @@ function Footer() {
     <footer>
       This project was coded by Stephanie White
       <a href="https://github.com/stephaniechatter" target="_blank" rel="noopener noreferrer"> and is <a href="https://github.com/Stephaniechatter/whimsicalweatherapp"target="_blank">open sourced</a>
-        and hosted on <a href= "" target="_blank">Netlify</a>
+        and hosted on <a href= "app.netlify.com" target="_blank">Netlify</a>
       </a>
       .
     </footer>
