@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faCloudSun, faCloud, faCloudRain } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios'; // Import Axios
+import moment from 'moment';
+import 'moment-timezone';
 import "./App.css";
 
 const API_KEY = "cb286bad3607984b41ed10c8de5cf00e"; 
@@ -24,8 +25,11 @@ function App() {
 
   const fetchWeatherData = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-      const data = response.data;
+      const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+      if (!response.ok) {
+        throw new Error('Weather data not available for that city.');
+      }
+      const data = await response.json();
 
       setTemperatureC(data.main.temp);
       setTemperatureF(convertCtoF(data.main.temp));
@@ -33,11 +37,8 @@ function App() {
       setHumidity(data.main.humidity);
       setWindSpeedKmh(data.wind.speed);
       setWindSpeedMph(convertKmhtoMph(data.wind.speed));
-      const currentTime = new Date().toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      });
+
+      const currentTime = moment().format('h:mm A'); // Format time in 12-hour format
       setTime(currentTime);
 
       setForecast([
