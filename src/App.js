@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faCloudSun, faCloud, faCloudRain } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment';
-import 'moment-timezone';
 import axios from 'axios';
+import moment from 'moment-timezone';
 import "./App.css";
 
-const API_KEY = "cb286bad3607984b41ed10c8de5cf00e"; 
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+const API_KEY = "cb286bad3607984b41ed10c8de5cf00e";
+const BASE_URL = "https://api.openweathermap.org/data/2.5";
+const FORECAST_URL = `${BASE_URL}/forecast`;
 
 function App() {
   const [city, setCity] = useState("New York");
@@ -26,38 +26,39 @@ function App() {
 
   const fetchWeatherData = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-      if (!response.data || !response.data.main || !response.data.weather) {
-        throw new Error('Weather data not available for that city.');
-      }
-      const data = response.data;
+      // Fetch current weather data
+      const currentWeatherResponse = await axios.get(`${BASE_URL}/weather?q=${city}&appid=${API_KEY}&units=metric`);
+      const currentWeatherData = currentWeatherResponse.data;
 
-      setTemperatureC(data.main.temp);
-      setTemperatureF(convertCtoF(data.main.temp));
-      setDescription(data.weather[0].description);
-      setHumidity(data.main.humidity);
-      setWindSpeedKmh(data.wind.speed);
-      setWindSpeedMph(convertKmhtoMph(data.wind.speed));
+      setTemperatureC(currentWeatherData.main.temp);
+      setTemperatureF(convertCtoF(currentWeatherData.main.temp));
+      setDescription(currentWeatherData.weather[0].description);
+      setHumidity(currentWeatherData.main.humidity);
+      setWindSpeedKmh(currentWeatherData.wind.speed);
+      setWindSpeedMph(convertKmhtoMph(currentWeatherData.wind.speed));
+      setTime(getCurrentTime());
 
-      const currentTime = moment().format('h:mm A');
-      setTime(currentTime);
+      // Fetch 4-day forecast data
+      const forecastResponse = await axios.get(`${FORECAST_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+      const forecastData = forecastResponse.data.list;
 
-      // Example forecast data, replace with actual data
-      setForecast([
-        { day: "Mon", tempC: 20, tempF: convertCtoF(20), icon: faSun, className: "fa-sun" },
-        { day: "Tue", tempC: 18, tempF: convertCtoF(18), icon: faCloudSun, className: "fa-cloud-sun" },
-        { day: "Wed", tempC: 22, tempF: convertCtoF(22), icon: faCloud, className: "fa-cloud" },
-        { day: "Thu", tempC: 19, tempF: convertCtoF(19), icon: faCloudRain, className: "fa-cloud-rain" },
-      ]);
+      // Process forecast data
+      const formattedForecast = forecastData.slice(0, 4).map(item => ({
+        day: moment(item.dt_txt).format('ddd'),
+        temperatureC: item.main.temp,
+        temperatureF: convertCtoF(item.main.temp),
+        icon: getWeatherIcon(item.weather[0].main),
+        className: getWeatherIconClassName(item.weather[0].main)
+      }));
+
+      setForecast(formattedForecast);
     } catch (error) {
       console.error('Error fetching weather data:', error.message);
     }
   };
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    const cityInput = event.target.elements.city.value;
-    setCity(cityInput);
+  const getCurrentTime = () => {
+    return moment().format('h:mm A');
   };
 
   const convertCtoF = (celsius) => {
@@ -66,6 +67,38 @@ function App() {
 
   const convertKmhtoMph = (kmh) => {
     return kmh / 1.60934;
+  };
+
+  const getWeatherIcon = (weatherMain) => {
+    switch (weatherMain) {
+      case 'Clear':
+        return faSun;
+      case 'Clouds':
+        return faCloud;
+      case 'Rain':
+        return faCloudRain;
+      default:
+        return faCloudSun;
+    }
+  };
+
+  const getWeatherIconClassName = (weatherMain) => {
+    switch (weatherMain) {
+      case 'Clear':
+        return 'fa-sun';
+      case 'Clouds':
+        return 'fa-cloud';
+      case 'Rain':
+        return 'fa-cloud-rain';
+      default:
+        return 'fa-cloud-sun';
+    }
+  };
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    const cityInput = event.target.elements.city.value;
+    setCity(cityInput);
   };
 
   return (
@@ -87,10 +120,10 @@ function App() {
         <div className="weather-app-data">
           <h1 className="default-city-name">{city}</h1>
           <p className="weather-app-image">
-            <FontAwesomeIcon icon={description === "Clear" ? faSun : description === "Clouds" ? faCloud : faCloudRain} size="2x" className="weather-icon" />
+            <FontAwesomeIcon icon={getWeatherIcon(description)} size="2x" className={getWeatherIconClassName(description)} />
           </p>
           <p className="weather-app-details">
-            Temperature: <strong>{temperatureC}°C | {temperatureF ? temperatureF.toFixed(2) + '°F' : '--'}</strong>, Humidity:{" "}
+            Temperature: <strong>{temperatureC.toFixed(2)}°C | {temperatureF.toFixed(2)}°F</strong>, Humidity:{" "}
             <strong>{humidity}%</strong>, Wind: <strong>{windSpeedKmh.toFixed(2)} km/h | {windSpeedMph.toFixed(2)} mph</strong>,
             Time: <strong>{time}</strong>
           </p>
@@ -101,8 +134,7 @@ function App() {
             {forecast.map((item, index) => (
               <div key={index} className="forecast-item">
                 <FontAwesomeIcon icon={item.icon} size="2x" className={item.className} />
-                <p>{item.day}</p>
-                <p><strong>{item.tempC}°C | {item.tempF ? item.tempF.toFixed(2) + '°F' : '--'}</strong></p>
+                <p>{item.day}: <strong>{item.temperatureC.toFixed(2)}°C | {item.temperatureF.toFixed(2)}°F</strong></p>
               </div>
             ))}
           </div>
