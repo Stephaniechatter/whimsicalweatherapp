@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faCloudSun, faCloud, faCloudRain } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import 'moment-timezone';
+import axios from 'axios';
 import "./App.css";
 
 const API_KEY = "cb286bad3607984b41ed10c8de5cf00e"; 
@@ -25,11 +26,11 @@ function App() {
 
   const fetchWeatherData = async () => {
     try {
-      const response = await fetch(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-      if (!response.ok) {
+      const response = await axios.get(`${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+      if (!response.data || !response.data.main || !response.data.weather) {
         throw new Error('Weather data not available for that city.');
       }
-      const data = await response.json();
+      const data = response.data;
 
       setTemperatureC(data.main.temp);
       setTemperatureF(convertCtoF(data.main.temp));
@@ -38,14 +39,15 @@ function App() {
       setWindSpeedKmh(data.wind.speed);
       setWindSpeedMph(convertKmhtoMph(data.wind.speed));
 
-      const currentTime = moment().format('h:mm A'); // Format time in 12-hour format
+      const currentTime = moment().format('h:mm A');
       setTime(currentTime);
 
+      // Example forecast data, replace with actual data
       setForecast([
-        { day: "Mon", icon: faSun, className: "fa-sun" },
-        { day: "Tue", icon: faCloudSun, className: "fa-cloud-sun" },
-        { day: "Wed", icon: faCloud, className: "fa-cloud" },
-        { day: "Thu", icon: faCloudRain, className: "fa-cloud-rain" },
+        { day: "Mon", tempC: 20, tempF: convertCtoF(20), icon: faSun, className: "fa-sun" },
+        { day: "Tue", tempC: 18, tempF: convertCtoF(18), icon: faCloudSun, className: "fa-cloud-sun" },
+        { day: "Wed", tempC: 22, tempF: convertCtoF(22), icon: faCloud, className: "fa-cloud" },
+        { day: "Thu", tempC: 19, tempF: convertCtoF(19), icon: faCloudRain, className: "fa-cloud-rain" },
       ]);
     } catch (error) {
       console.error('Error fetching weather data:', error.message);
@@ -88,7 +90,7 @@ function App() {
             <FontAwesomeIcon icon={description === "Clear" ? faSun : description === "Clouds" ? faCloud : faCloudRain} size="2x" className="weather-icon" />
           </p>
           <p className="weather-app-details">
-            Temperature: <strong>{temperatureC}°C | {temperatureF.toFixed(2)}°F</strong>, Humidity:{" "}
+            Temperature: <strong>{temperatureC}°C | {temperatureF ? temperatureF.toFixed(2) + '°F' : '--'}</strong>, Humidity:{" "}
             <strong>{humidity}%</strong>, Wind: <strong>{windSpeedKmh.toFixed(2)} km/h | {windSpeedMph.toFixed(2)} mph</strong>,
             Time: <strong>{time}</strong>
           </p>
@@ -100,6 +102,7 @@ function App() {
               <div key={index} className="forecast-item">
                 <FontAwesomeIcon icon={item.icon} size="2x" className={item.className} />
                 <p>{item.day}</p>
+                <p><strong>{item.tempC}°C | {item.tempF ? item.tempF.toFixed(2) + '°F' : '--'}</strong></p>
               </div>
             ))}
           </div>
